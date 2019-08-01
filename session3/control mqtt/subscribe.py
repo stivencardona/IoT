@@ -7,7 +7,16 @@ import RPi.GPIO as GPIO
 # Import paho MQTT Client
 import paho.mqtt.client as mqtt
 
+GPIO.setmode(GPIO.BCM)
+pinList = [i for i in range(2,28)]
+pines = {}
 
+GPIO.setup(pinList, GPIO.OUT, initial=GPIO.LOW)
+for p in pinList:
+
+    pines[p] = GPIO.PWM(p, 60)
+    pines[p].start(0)
+        
 def on_connect(client, userdata, flags, rc):
 
     if rc== 0:
@@ -22,6 +31,35 @@ def on_message(client, userdata, message):
 
     print("message received " ,str(message.payload.decode("utf-8")))
     print("message topic=",message.topic)
+    msj = str(message.payload.decode("utf-8"))
+    leds,porcentaje = msj.split("|")
+    print(leds)
+    leds = eval(leds)
+    print(leds)
+    if message.topic == "grupo6/luces":
+        print("vamos a prender o apagar luces")
+
+        if porcentaje == "ON":
+            print("encender leds..")
+            for l in leds :
+                print("led ",l)
+                pines[l].ChangeDutyCycle(99) 
+        elif porcentaje == "OFF":
+            print("apagar leds")
+            for l in leds :
+                print("led", l)
+                pines[l].ChangeDutyCycle(0) 
+        else:
+            print("no se hara nada porcentajes invalidos")
+
+    elif message.topic == "grupo6/iluminacion":
+        porcentaje = int(porcentaje)
+        print("vamsos a cambiar la luminosidad de las luces")
+
+        for l in leds :
+            print("led ",l)
+            pines[l].ChangeDutyCycle(porcentaje)
+            
 
 
 

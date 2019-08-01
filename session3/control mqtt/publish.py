@@ -19,21 +19,18 @@ def on_disconnect(client):
 
 def makeDataToSend():
 	
-    tipo = None
-    op = None
-    try:
-        tipo = sys.argv[2]
-        op = tipo.argv[3]	
-    except:
-        sys.stderr.write("HABITACIONES Y PISOS NO SON VALORES VALIDOS")
-        os._exit(1)
 
-	
+	#aqui se haria el control de errores pero se dejara para una proxima ocasion
+	tipo = sys.argv[2]
+	op = sys.argv[3]
+
+	topic = "grupo6/{}".format(tipo)	
+	return topic,op
 	
 
 if __name__ == "__main__":
-	if(len(sys.argv)<5): 
-		sys.stderr.write('Usage: "{0}" $hostAddress piso habitacion operation l1 [l2 l3 ... ln]\n'.format(sys.argv[0]))
+	if(len(sys.argv) != 4): 
+		sys.stderr.write('Usage: "{0}" $hostAddress TIPO:luces/iluminacion operacion:[#,#,#,..,#]|ON/ [#,#,#,..#]|porcentaje\n'.format(sys.argv[0]))
 		os._exit(1)
 		
 		
@@ -62,14 +59,8 @@ if __name__ == "__main__":
 		time.sleep(1)
 	
 	t,m = makeDataToSend()
-	print("Publicando al topic ->'{0}'".format(t))
+	print("Publicando al topic ->'{0}'".format(t), "el siguiente mensaje: ".format(m))
 	client.publish(t,m)
-	"""
-	print("Publicando al topic ->'{0}'".format("area0/plant0/temperatura"))
-	client.publish("area0/plant0/temperatura","{temperatura: 30}")
-	print("Publicando al topic ->'{0}'".format("area0/plant0/humedad"))
-	client.publish("area0/plant0/humedad","{humedad: 70}")
-	"""
 	
 	
 	client.loop_stop()
